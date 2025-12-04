@@ -5,56 +5,128 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Trip Checklist</title>
   <style>
-    /* (styles unchanged from your version, omitted for brevity in this message) */
-    /* Copy the styles block exactly from your last file — I left them unchanged. */
-    :root{ --bg:#0b0f12; --surface:rgba(255,255,255,0.03); --panel:rgba(255,255,255,0.02); --text:#e6eef2; --muted:#9aa4ad; --accent:#0a84ff; --success:#32d74b; --glass-border:rgba(255,255,255,0.04); --radius:14px; --card:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); color-scheme:dark; transition:background-color .32s ease, color .32s ease; font-family:-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, Inter, system-ui, 'Helvetica Neue', Arial; }
-    html.light{ --bg:#ffffff; --surface:rgba(0,0,0,0.03); --panel:rgba(0,0,0,0.02); --text:#1d1d1f; --muted:#6b6b6f; --glass-border:rgba(0,0,0,0.06); --card:linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01)); color-scheme:light }
-    *{box-sizing:border-box} html,body{height:100%} body{margin:0; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; display:flex; align-items:center; justify-content:center; padding:24px; font-size:15px}
-    .container{ width:min(920px,96vw); background:var(--card); border-radius:20px; padding:24px; box-shadow: 0 10px 40px rgba(2,6,10,0.45); backdrop-filter: blur(8px); border:1px solid var(--glass-border); transition: background-color .32s ease, border-color .32s ease, box-shadow .32s ease; max-width:1100px; }
-    header{display:flex; align-items:center; gap:16px; margin-bottom:14px}
-    .logo{width:56px; height:56px; border-radius:14px; display:grid; place-items:center; background:linear-gradient(135deg,#132427 0%, #102e25 100%); box-shadow: 0 6px 14px rgba(6,12,10,0.6); border:1px solid rgba(255,255,255,0.04)}
-    h1{font-size:20px;margin:0;letter-spacing:0.2px} p.lead{margin:0;color:var(--muted); font-size:13px}
-    .top-controls{margin-left:auto; display:flex; gap:10px; align-items:center}
-    .theme-switch{ display:inline-flex; align-items:center; gap:8px; background:transparent; border-radius:999px; padding:6px; border:1px solid var(--glass-border); }
-    .toggle{ position:relative; width:68px; height:36px; border-radius:999px; background:linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02)); display:flex; align-items:center; padding:4px; cursor:pointer; transition:background .22s ease, box-shadow .22s ease; box-shadow: inset 0 -6px 18px rgba(0,0,0,0.06); }
-    html.light .toggle{ background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255,255,255,0.6)); box-shadow: 0 6px 18px rgba(10,10,10,0.06) }
-    .knob{width:28px;height:28px;border-radius:999px;background:var(--text); box-shadow:0 6px 14px rgba(2,6,10,0.35); transform:translateX(0); transition:transform .28s cubic-bezier(.2,.9,.2,1)}
-    html.light .knob{ transform:translateX(32px) }
+    /* Apple-like system font + polished dark/light theming */
+    :root{
+      --bg: #0b0f12;                /* dark */
+      --surface: rgba(255,255,255,0.03);
+      --panel: rgba(255,255,255,0.02);
+      --text: #e6eef2;
+      --muted: #9aa4ad;
+      --accent: #0a84ff;           /* iOS blue accent for light theme actions */
+      --success: #32d74b;
+      --glass-border: rgba(255,255,255,0.04);
+      --radius:14px;
+      --card: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      color-scheme: dark;
+      transition: background-color .32s ease, color .32s ease;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, Inter, system-ui, 'Helvetica Neue', Arial;
+    }
+
+    /* Light theme variables (applied when .light on html) */
+    html.light{ --bg: #ffffff; --surface: rgba(0,0,0,0.03); --panel: rgba(0,0,0,0.02); --text: #1d1d1f; --muted: #6b6b6f; --glass-border: rgba(0,0,0,0.06); --card: linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01)); color-scheme: light }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      display:flex; align-items:flex-start; justify-content:center; padding:18px; font-size:15px;
+    }
+
+    /* Make container fluid on small screens and centered on larger ones */
+    .container{
+      width:100%; max-width:920px; background:var(--card);
+      border-radius:20px; padding:18px; box-shadow: 0 10px 40px rgba(2,6,10,0.45);
+      backdrop-filter: blur(8px);
+      border:1px solid var(--glass-border);
+      transition: background-color .32s ease, border-color .32s ease, box-shadow .32s ease;
+      margin: 8px; /* small margin so it doesn't touch screen edges */
+    }
+
+    header{display:flex; align-items:center; gap:12px; margin-bottom:12px; flex-wrap:wrap}
+    .logo{width:48px; height:48px; border-radius:12px; display:grid; place-items:center; background:linear-gradient(135deg,#132427 0%, #102e25 100%); box-shadow: 0 6px 14px rgba(6,12,10,0.6); border:1px solid rgba(255,255,255,0.04)}
+    .logo svg{filter:drop-shadow(0 6px 10px rgba(0,0,0,0.6))}
+
+    h1{font-size:18px;margin:0;letter-spacing:0.2px}
+    p.lead{margin:0;color:var(--muted); font-size:13px}
+
+    .top-controls{margin-left:auto; display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+
+    .theme-switch{display:inline-flex; align-items:center; gap:8px; background:transparent; border-radius:999px; padding:6px; border:1px solid var(--glass-border);}
+    .toggle{position:relative; width:64px; height:34px; border-radius:999px; background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.02)); display:flex; align-items:center; padding:4px; cursor:pointer; transition:background .22s ease, box-shadow .22s ease; box-shadow: inset 0 -6px 18px rgba(0,0,0,0.06);}
+    .knob{width:26px; height:26px; border-radius:999px; background:var(--text); box-shadow:0 6px 14px rgba(2,6,10,0.35); transform:translateX(0); transition:transform .28s cubic-bezier(.2,.9,.2,1)}
+    html.light .knob{ transform:translateX(30px) }
     .icon-sun, .icon-moon{font-size:13px; opacity:.8}
-    .btn{background:transparent;border:1px solid rgba(255,255,255,0.04); color:inherit;padding:8px 10px;border-radius:10px;cursor:pointer;font-weight:600; font-size:13px}
-    .search-row{display:flex; gap:12px; margin-top:12px}
-    .input, .search{flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--glass-border); background:transparent;color:inherit; outline:none}
+
+    .btn{background:transparent;border:1px solid rgba(255,255,255,0.04); color:inherit;padding:8px 10px;border-radius:10px;cursor:pointer;font-weight:700; font-size:13px}
+
+    .search-row{display:flex; gap:10px; margin-top:10px}
+    .input, .search{flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--glass-border); background:transparent;color:inherit; outline:none; min-width:0}
     .add-wrap{display:flex; gap:8px}
     .add-btn{padding:12px 14px; border-radius:12px; background:linear-gradient(90deg,var(--accent), #2a84ff); color:white; font-weight:700; border:none; cursor:pointer}
-    .panel{margin-top:16px; background:var(--panel); padding:14px; border-radius:16px; min-height:220px}
+
+    .panel{margin-top:12px; background:var(--panel); padding:12px; border-radius:14px; min-height:180px}
     .list{display:flex; flex-direction:column; gap:10px}
-    .item{display:flex; gap:12px; align-items:center; padding:12px; border-radius:12px; background:transparent; border:1px solid rgba(255,255,255,0.02); transition:transform .22s cubic-bezier(.2,.9,.2,1), box-shadow .22s;}
-    .handle{width:36px;height:36px;border-radius:10px; display:grid; place-items:center; cursor:grab; border:1px solid rgba(255,255,255,0.03)}
+    .item{display:flex; gap:10px; align-items:center; padding:10px; border-radius:10px; background:transparent; border:1px solid rgba(255,255,255,0.02); transition:transform .22s cubic-bezier(.2,.9,.2,1), box-shadow .22s;}
+    .handle{width:34px;height:34px;border-radius:8px; display:grid; place-items:center; cursor:grab; border:1px solid rgba(255,255,255,0.03)}
     .checkbox{width:20px;height:20px;border-radius:6px;border:1px solid rgba(255,255,255,0.06); display:grid; place-items:center; cursor:pointer}
     .checkbox.checked{background:linear-gradient(90deg,var(--success), #6be3b3); border: none}
     .text{flex:1; font-size:15px; min-width:0}
     .meta{font-size:12px;color:var(--muted)}
-    .actions{display:flex; gap:8px}
+    .actions{display:flex; gap:6px}
+    .icon-btn{background:transparent;border:0;color:var(--muted); cursor:pointer; padding:8px;border-radius:8px}
+
     .mobile-move{display:none; gap:6px}
     .move-btn{padding:8px 10px;border-radius:8px;border:1px solid var(--glass-border); background:transparent; font-weight:700}
-    .footer{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; margin-top:14px; color:var(--muted); font-size:13px; gap:8px}
-    @media (max-width:720px){ .search-row{flex-direction:column} .add-wrap{width:100%; flex-direction:row} .add-btn{width:100%} .handle{display:none} .mobile-move{display:flex} }
-    @media (max-width:420px){ .add-wrap{flex-direction:column} .add-btn{width:100%} .theme-switch{display:none} }
-    .empty{display:grid;place-items:center;padding:40px;border-radius:12px;border:1px dashed rgba(255,255,255,0.03); color:var(--muted)}
+
+    .footer{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; margin-top:12px; color:var(--muted); font-size:13px; gap:8px}
+
+    @keyframes popIn{0%{transform:translateY(8px) scale(.99);opacity:0}100%{transform:none;opacity:1}}
+    .item.enter{animation:popIn .28s cubic-bezier(.2,.9,.2,1)}
+
+    /* Responsive: stack header & controls on narrow screens, make inputs full width */
+    @media (max-width:720px){
+      body{padding:10px}
+      .container{padding:14px}
+      header{align-items:flex-start}
+      .logo{width:44px;height:44px}
+      .top-controls{width:100%; margin-left:0; justify-content:flex-end}
+      .search-row{flex-direction:column}
+      .add-wrap{width:100%; flex-direction:row}
+      .add-wrap .input{flex:1}
+      .add-btn{width:120px}
+      .handle{display:none}
+      .mobile-move{display:flex}
+      .panel{padding:10px}
+    }
+
+    /* Extra small phones: reduce paddings, full-width inputs, hide non-essential controls */
+    @media (max-width:420px){
+      .container{padding:12px;border-radius:12px}
+      .add-wrap{flex-direction:column; gap:8px}
+      .add-btn{width:100%}
+      .theme-switch{display:none}
+      .top-controls{justify-content:flex-end}
+      h1{font-size:16px}
+    }
+
+    .empty{display:grid;place-items:center;padding:28px;border-radius:10px;border:1px dashed rgba(255,255,255,0.03); color:var(--muted)}
+    input:focus, button:focus{outline:2px solid rgba(10,132,255,0.12); outline-offset:2px}
   </style>
 </head>
 <body>
   <div class="container" role="application" aria-label="Trip checklist app">
     <header>
       <div class="logo" aria-hidden="true">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="2" y="6" width="20" height="12" rx="3" fill="#051a17" stroke="#0f352d"/>
           <path d="M7 9h10v6H7z" fill="#6be3b3" opacity="0.18"/>
-          <circle cx="9" cy="12" r="1.8" fill="#6be3b3" />
+          <circle cx="9" cy="12" r="1.6" fill="#6be3b3" />
         </svg>
       </div>
+
       <div style="flex:1;min-width:0">
         <h1>Trip Checklist</h1>
+        <p class="lead">Smart, offline-first checklist for trips — add, reorder, export.</p>
       </div>
 
       <div class="top-controls">
@@ -74,8 +146,7 @@
     <div class="search-row">
       <input id="itemInput" class="input" placeholder="Add item(s) — separate multiple with commas (e.g. 'jacket, socks, charger')" aria-label="New checklist item(s)" />
       <div class="add-wrap">
-        <input id="noteInput" class="input" placeholder="Optional note (applies to all added items)" style="width:220px" aria-label="Optional note" />
-        <!-- ensure button is type=button so Enter doesn't accidentally submit anything in some browser edge cases -->
+        <input id="noteInput" class="input" placeholder="Optional note (applies to all added items)" aria-label="Optional note" />
         <button id="addBtn" type="button" class="add-btn">Add</button>
       </div>
     </div>
@@ -91,146 +162,57 @@
     </div>
   </div>
 
-  <!-- SheetJS CDN for xlsx export (optional). Fallback to CSV if unavailable. -->
+  <!-- SheetJS (xlsx) for Excel export. If offline, the code falls back to CSV which Excel can open. -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       try { console.info('Trip Checklist: DOM ready') } catch(e){}
 
-      /* --- Elements --- */
-      const htmlEl = document.documentElement;
-      const themeToggle = document.getElementById('themeToggle');
-      const knob = document.getElementById('knob');
-      const listEl = document.getElementById('list');
-      const input = document.getElementById('itemInput');
-      const noteInput = document.getElementById('noteInput');
-      const addBtn = document.getElementById('addBtn');
-      const empty = document.getElementById('empty');
-      const count = document.getElementById('count');
-      const exportBtn = document.getElementById('exportBtn');
-      const clearBtn = document.getElementById('clearBtn');
+      const htmlEl = document.documentElement
+      const themeToggle = document.getElementById('themeToggle')
+      const knob = document.getElementById('knob')
+      const listEl = document.getElementById('list')
+      const input = document.getElementById('itemInput')
+      const noteInput = document.getElementById('noteInput')
+      const addBtn = document.getElementById('addBtn')
+      const empty = document.getElementById('empty')
+      const count = document.getElementById('count')
+      const exportBtn = document.getElementById('exportBtn')
+      const clearBtn = document.getElementById('clearBtn')
 
-      /* --- Theme --- */
-      const saved = localStorage.getItem('trip.theme');
-      const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      let theme = saved || (systemDark ? 'dark' : 'light');
-      function applyTheme(t){
-        if(t === 'light'){ htmlEl.classList.add('light'); themeToggle.setAttribute('aria-checked','true') }
-        else { htmlEl.classList.remove('light'); themeToggle.setAttribute('aria-checked','false') }
-        localStorage.setItem('trip.theme', t);
-      }
-      applyTheme(theme);
-      function animateKnob(){ const toLight = htmlEl.classList.contains('light'); knob.animate([{transform: toLight? 'translateX(32px)':'translateX(0)'},{transform: toLight? 'translateX(28px)':'translateX(4px)'},{transform: toLight? 'translateX(32px)':'translateX(0)'}], {duration:320, easing:'cubic-bezier(.2,.9,.2,1)'}).onfinish = ()=>{} }
+      const saved = localStorage.getItem('trip.theme')
+      const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+      let theme = saved || (systemDark ? 'dark' : 'light')
+      function applyTheme(t){ if(t === 'light'){ htmlEl.classList.add('light'); themeToggle.setAttribute('aria-checked','true') } else { htmlEl.classList.remove('light'); themeToggle.setAttribute('aria-checked','false') } localStorage.setItem('trip.theme', t) }
+      applyTheme(theme)
+      function animateKnob(){ const toLight = htmlEl.classList.contains('light'); knob.animate([{transform: toLight? 'translateX(30px)':'translateX(0)'},{transform: toLight? 'translateX(26px)':'translateX(4px)'},{transform: toLight? 'translateX(30px)':'translateX(0)'}], {duration:300, easing:'cubic-bezier(.2,.9,.2,1)'}).onfinish = ()=>{} }
       themeToggle.addEventListener('click', ()=>{ theme = theme === 'light' ? 'dark' : 'light'; applyTheme(theme); animateKnob() })
       themeToggle.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); theme = theme === 'light' ? 'dark' : 'light'; applyTheme(theme); animateKnob() } })
       if(window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => { const sys = e.matches ? 'dark' : 'light'; if(!localStorage.getItem('trip.theme')){ theme = sys; applyTheme(theme); animateKnob() } })
 
-      /* --- App state --- */
-      const ID = () => '_' + Math.random().toString(36).slice(2,9);
-      let items = JSON.parse(localStorage.getItem('trip.checklist.v1') || '[]');
-      function save(){ localStorage.setItem('trip.checklist.v1', JSON.stringify(items)); }
+      const ID = () => '_' + Math.random().toString(36).slice(2,9)
+      let items = JSON.parse(localStorage.getItem('trip.checklist.v1') || '[]')
+      function save(){ localStorage.setItem('trip.checklist.v1', JSON.stringify(items)) }
 
-      /* --- Parsing & add --- */
-      function parseItemsFromText(text){
-        if(!text) return [];
-        const normalized = text.replace(/[\r\n]+/g, ',').replace(/[,;]+/g, ',');
-        return normalized.split(',').map(s=>s.trim()).filter(Boolean);
-      }
+      function parseItemsFromText(text){ if(!text) return []; const normalized = text.replace(/[
+]+/g, ',').replace(/[,;]+/g, ','); return normalized.split(',').map(s=>s.trim()).filter(Boolean) }
 
-      function addItemsFromInput(e){
-        if(e && e.preventDefault) e.preventDefault();
-        const raw = input.value || '';
-        const note = noteInput.value || '';
-        const parsed = parseItemsFromText(raw);
-        console.debug('Adding items parsed:', parsed);
-        if(parsed.length === 0){
-          // give a little feedback
-          input.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:240});
-          return;
-        }
-        const newItems = parsed.map(t => ({ id: ID(), text: t, note: note.trim(), done: false, important: false }));
-        items = newItems.concat(items);
-        save();
-        render();
-        animateAdd();
-        input.value = '';
-        noteInput.value = '';
-        input.focus();
-      }
+      function addItemsFromInput(e){ if(e && e.preventDefault) e.preventDefault(); const raw = input.value || ''; const note = noteInput.value || ''; const parsed = parseItemsFromText(raw); console.debug('Adding items parsed:', parsed); if(parsed.length === 0){ input.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:240}); return } const newItems = parsed.map(t => ({ id: ID(), text: t, note: note.trim(), done: false, important: false })); items = newItems.concat(items); save(); render(); animateAdd(); input.value = ''; noteInput.value = ''; input.focus() }
 
-      /* --- Render --- */
-      function render(){
-        listEl.innerHTML = '';
-        if(items.length === 0){ empty.style.display = 'grid'; count.textContent = '0 items'; return; }
-        empty.style.display = 'none';
-        items.forEach((it, idx) => {
-          const el = document.createElement('div'); el.className = 'item enter'; el.draggable = true; el.dataset.id = it.id;
+      function render(){ listEl.innerHTML = ''; if(items.length === 0){ empty.style.display = 'grid'; count.textContent = '0 items'; return } empty.style.display = 'none'; items.forEach((it, idx) => { const el = document.createElement('div'); el.className = 'item enter'; el.draggable = true; el.dataset.id = it.id; const handle = document.createElement('div'); handle.className = 'handle'; handle.title = 'Drag to reorder'; handle.innerHTML = '☰'; const cb = document.createElement('div'); cb.className = 'checkbox' + (it.done ? ' checked' : ''); cb.setAttribute('role','button'); cb.onclick = ()=>{ it.done = !it.done; animateToggle(el, it.done); save(); render(); }; cb.innerHTML = it.done ? '✓' : ''; const text = document.createElement('div'); text.className = 'text' + (it.done ? ' done' : ''); text.textContent = it.text; text.ondblclick = ()=>{ editText(it, text) }; const meta = document.createElement('div'); meta.className = 'meta'; meta.textContent = it.note || ''; const actions = document.createElement('div'); actions.className = 'actions'; const del = document.createElement('button'); del.className='icon-btn'; del.innerHTML='🗑'; del.title='Delete'; del.onclick = ()=>{ removeItem(it.id) }; const star = document.createElement('button'); star.className='icon-btn'; star.innerHTML = it.important ? '★' : '☆'; star.onclick = ()=>{ it.important = !it.important; save(); render() }; actions.appendChild(star); actions.appendChild(del); el.appendChild(handle); el.appendChild(cb); const mid = document.createElement('div'); mid.style.flex='1'; mid.appendChild(text); if(it.note) mid.appendChild(meta); el.appendChild(mid); const mobileMove = document.createElement('div'); mobileMove.className='mobile-move'; const up = document.createElement('button'); up.className='move-btn'; up.textContent='↑'; up.onclick = ()=>{ moveItem(idx, idx-1) }; const down = document.createElement('button'); down.className='move-btn'; down.textContent='↓'; down.onclick = ()=>{ moveItem(idx, idx+1) }; mobileMove.appendChild(up); mobileMove.appendChild(down); el.appendChild(mobileMove); el.appendChild(actions); el.addEventListener('dragstart', (e)=>{ el.classList.add('dragging'); e.dataTransfer.setData('text/plain', it.id); setTimeout(()=>el.style.display='none', 50) }); el.addEventListener('dragend', ()=>{ el.classList.remove('dragging'); el.style.display='flex'; render() }); listEl.appendChild(el); }); listEl.querySelectorAll('.item').forEach(node => { node.addEventListener('dragover', (e)=>{ e.preventDefault(); const dragging = document.querySelector('.dragging'); if(!dragging || dragging===node) return; const rect = node.getBoundingClientRect(); const next = (e.clientY - rect.top) > rect.height/2; listEl.insertBefore(dragging, next ? node.nextSibling : node); }); node.addEventListener('drop', (e)=>{ e.preventDefault(); const id = e.dataTransfer.getData('text/plain'); finishReorder(id); }); }); count.textContent = items.length + ' items (' + items.filter(i=>i.done).length + ' done)'; }
 
-          const handle = document.createElement('div'); handle.className = 'handle'; handle.title = 'Drag to reorder'; handle.innerHTML = '☰';
-          const cb = document.createElement('div'); cb.className = 'checkbox' + (it.done ? ' checked' : ''); cb.setAttribute('role','button');
-          cb.onclick = ()=>{ it.done = !it.done; animateToggle(el, it.done); save(); render(); }
-          cb.innerHTML = it.done ? '✓' : '';
-
-          const text = document.createElement('div'); text.className = 'text' + (it.done ? ' done' : ''); text.textContent = it.text;
-          text.ondblclick = ()=>{ editText(it, text) }
-
-          const meta = document.createElement('div'); meta.className = 'meta'; meta.textContent = it.note || '';
-
-          const actions = document.createElement('div'); actions.className = 'actions';
-          const del = document.createElement('button'); del.className='icon-btn'; del.innerHTML='🗑'; del.title='Delete'; del.onclick = ()=>{ removeItem(it.id) }
-          const star = document.createElement('button'); star.className='icon-btn'; star.innerHTML = it.important ? '★' : '☆'; star.onclick = ()=>{ it.important = !it.important; save(); render() }
-          actions.appendChild(star); actions.appendChild(del);
-
-          el.appendChild(handle); el.appendChild(cb);
-          const mid = document.createElement('div'); mid.style.flex='1'; mid.appendChild(text); if(it.note) mid.appendChild(meta);
-          el.appendChild(mid);
-
-          const mobileMove = document.createElement('div'); mobileMove.className='mobile-move';
-          const up = document.createElement('button'); up.className='move-btn'; up.textContent='↑'; up.onclick = ()=>{ moveItem(idx, idx-1) }
-          const down = document.createElement('button'); down.className='move-btn'; down.textContent='↓'; down.onclick = ()=>{ moveItem(idx, idx+1) }
-          mobileMove.appendChild(up); mobileMove.appendChild(down);
-          el.appendChild(mobileMove);
-
-          el.appendChild(actions);
-
-          el.addEventListener('dragstart', (e)=>{ el.classList.add('dragging'); e.dataTransfer.setData('text/plain', it.id); setTimeout(()=>el.style.display='none', 50) });
-          el.addEventListener('dragend', ()=>{ el.classList.remove('dragging'); el.style.display='flex'; render() });
-
-          listEl.appendChild(el);
-        });
-
-        // drag handlers
-        listEl.querySelectorAll('.item').forEach(node => {
-          node.addEventListener('dragover', (e)=>{ e.preventDefault(); const dragging = document.querySelector('.dragging'); if(!dragging || dragging===node) return; const rect = node.getBoundingClientRect(); const next = (e.clientY - rect.top) > rect.height/2; listEl.insertBefore(dragging, next ? node.nextSibling : node); });
-          node.addEventListener('drop', (e)=>{ e.preventDefault(); const id = e.dataTransfer.getData('text/plain'); finishReorder(id); });
-        });
-
-        count.textContent = items.length + ' items (' + items.filter(i=>i.done).length + ' done)';
-      }
-
-      function moveItem(from, to){
-        if(to < 0) to = 0; if(to >= items.length) to = items.length - 1;
-        const arr = items.slice(); const [item] = arr.splice(from,1); arr.splice(to,0,item); items = arr; save(); render();
-      }
-      function finishReorder(draggedId){
-        const currentIds = Array.from(listEl.children).map(ch=>ch.dataset.id); const newItems = [];
-        currentIds.forEach(id => { const it = items.find(o => o.id === id); if(it) newItems.push(it) });
-        items = newItems; save(); render();
-      }
+      function moveItem(from, to){ if(to < 0) to = 0; if(to >= items.length) to = items.length - 1; const arr = items.slice(); const [item] = arr.splice(from,1); arr.splice(to,0,item); items = arr; save(); render(); }
+      function finishReorder(draggedId){ const currentIds = Array.from(listEl.children).map(ch=>ch.dataset.id); const newItems = []; currentIds.forEach(id => { const it = items.find(o => o.id === id); if(it) newItems.push(it) }); items = newItems; save(); render(); }
       function addItem(text, note){ if(!text || !text.trim()) return; const item = {id:ID(), text:text.trim(), note: note?note.trim(): '', done:false, important:false}; items.unshift(item); save(); render(); animateAdd(); }
       function removeItem(id){ items = items.filter(i => i.id !== id); save(); render(); }
-      function editText(it, el){
-        const inputEl = document.createElement('input'); inputEl.value = it.text; inputEl.className = 'input'; el.replaceWith(inputEl); inputEl.focus(); inputEl.select();
-        inputEl.onblur = ()=>{ it.text = inputEl.value || it.text; save(); render(); }
-        inputEl.onkeydown = (e)=>{ if(e.key === 'Enter') inputEl.blur(); if(e.key === 'Escape') render(); }
-      }
-
+      function editText(it, el){ const inputEl = document.createElement('input'); inputEl.value = it.text; inputEl.className = 'input'; el.replaceWith(inputEl); inputEl.focus(); inputEl.select(); inputEl.onblur = ()=>{ it.text = inputEl.value || it.text; save(); render(); }; inputEl.onkeydown = (e)=>{ if(e.key === 'Enter') inputEl.blur(); if(e.key === 'Escape') render(); } }
       function animateAdd(){ const a = listEl.animate([{boxShadow:'0 6px 20px rgba(0,0,0,0.0)'}, {boxShadow:'0 22px 60px rgba(0,0,0,0.25)'}], {duration:420, easing:'cubic-bezier(.2,.9,.2,1)', direction:'alternate'}); a.onfinish = ()=>a.cancel(); }
       function animateToggle(el, done){ const keyframes = done ? [{transform:'scale(1)'},{transform:'scale(.98)'},{transform:'scale(1)'}] : [{opacity:1},{opacity:.8},{opacity:1}]; el.animate(keyframes, {duration:260, easing:'cubic-bezier(.2,.9,.2,1)'}); }
 
-      /* --- Export (xlsx via SheetJS, fallback CSV) --- */
-      function escapeCsv(str){ if(typeof str !== 'string') return '""'; if(str.includes(',') || str.includes('\n') || str.includes('"')){ return '"' + str.replace(/"/g,'""') + '"' } return '"' + str + '"' }
+      // Export
+      function escapeCsv(str){ if(typeof str !== 'string') return '""'; if(str.includes(',') || str.includes('
+') || str.includes('"')){ return '"' + str.replace(/"/g,'""') + '"' } return '"' + str + '"' }
       exportBtn.addEventListener('click', () => {
         try {
           if(typeof XLSX !== 'undefined') {
@@ -247,7 +229,8 @@
 
         const header = ['Text','Note','Done','Important'];
         const rows = items.map(i => [ escapeCsv(i.text), escapeCsv(i.note || ''), i.done ? 'Yes' : 'No', i.important ? 'Yes' : 'No' ]);
-        const csv = [ header.join(','), ...rows.map(r => r.join(',')) ].join('\n');
+        const csv = [ header.join(','), ...rows.map(r => r.join(',')) ].join('
+');
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a'); a.href = url; a.download = 'trip-checklist.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
@@ -255,18 +238,15 @@
 
       clearBtn.addEventListener('click', ()=>{ items = items.filter(i => !i.done); save(); render(); });
 
-      /* --- keyboard helpers --- */
+      // keyboard helpers & wiring
       input.addEventListener('keydown', (e) => { if(e.key === 'Enter'){ addItemsFromInput(e); } });
       noteInput.addEventListener('keydown', (e) => { if(e.key === 'Enter'){ addItemsFromInput(e); } });
       addBtn.addEventListener('click', (e) => { addItemsFromInput(e); });
-
       window.addEventListener('keydown', (e)=>{ if((e.ctrlKey || e.metaKey) && e.key === 'k'){ e.preventDefault(); input.focus() } if(e.key === '/' && document.activeElement !== input){ e.preventDefault(); input.focus() } });
 
-      /* initial render & debug */
       console.info('Trip Checklist: initializing with', items.length, 'items');
       render();
-      // end DOMContentLoaded
-    });
+    })
   </script>
 </body>
 </html>
